@@ -107,10 +107,10 @@ def main():
             shutil.move(os.path.join(folder_h5, filename), os.path.join(folder, filename))
         shutil.rmtree(folder_h5)
     elif args.dataset == 'shapenet_partseg':
-        # download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/train_data.zip', root, args.dataset)
-        # download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/train_label.zip', root, args.dataset)
-        # download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/val_data.zip', root, args.dataset)
-        # download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/val_label.zip', root, args.dataset)
+        download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/train_data.zip', root, args.dataset)
+        download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/train_label.zip', root, args.dataset)
+        download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/val_data.zip', root, args.dataset)
+        download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/val_label.zip', root, args.dataset)
         download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/test_data.zip', root, args.dataset)
         download_and_unzip('https://shapenet.cs.stanford.edu/iccv17/partseg/test_label.zip', root, args.dataset)
     elif args.dataset == 'mnist':

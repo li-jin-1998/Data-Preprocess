@@ -6,10 +6,10 @@ Some deep learning data preprocessing code。
 
 ## 2D Image Segmentation
 
-- [Copy data.](./image/1_seg_copy_data.py)
-- [Labelme to mask.](./image/2_labelme_to_mask.py)
-- [Data spilt.](./image/3_data_split.py)
-- [Augmentation.](./image/4_seg_augmentation.py)
+- [Copy data.](./image_segmentation/1_seg_copy_data.py)
+- [Labelme to mask.](./image_segmentation/2_labelme_to_mask.py)
+- [Data spilt.](./image_segmentation/3_data_split.py)
+- [Augmentation.](./image_segmentation/4_seg_augmentation.py)
 
 ## Point Cloud Segmentation
 
@@ -18,3 +18,9 @@ Some deep learning data preprocessing code。
 - [Extract file.](./point_cloud/3_extract_file.py)
 - [Data spilt.](./point_cloud/4_data_split.py)
 - [Transfer to h5py.](./point_cloud/5_prepare_data.py)
+
+## 2D Image Classification
+
+- [Extract data.](./image_classification/extract_file.py)
+- [Data spilt.](./image_classification/data_split_txt.py)
+- [Data clean.](./image_classification/data_clean.py)

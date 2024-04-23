@@ -1,0 +1,42 @@
+import os
+import shutil
+import glob
+
+origin_path=r'D:\Dataset\2D\外部收集\05_口外'
+
+result_path=r'D:\Projects\ScanSceneClassification\data\口外'
+# os.makedirs(result_path)
+for path in (os.listdir(origin_path)):
+    file_path=os.path.join(origin_path,path)
+    print(file_path)
+    paths=glob.glob(file_path+"/*_7_*.*")
+    print(len(paths))
+    paths2 = glob.glob(file_path + "/bite1/*_7.*")
+    print(len(paths2))
+    paths3 = glob.glob(file_path + "/bite2/*_7.*")
+    print(len(paths3))
+    # paths.extend(paths2)
+    # paths.extend(paths3)
+    print(len(paths))
+    result_path2=os.path.join(result_path,path)
+    print(result_path2)
+    # os.makedirs(result_path2)
+    for r_path in paths:
+        # print(r_path)
+        src=r_path
+        dst=r_path.replace(file_path,result_path2)
+        print(src,dst)
+        shutil.copy(src,dst)
+    for r_path in paths2:
+        # print(r_path)
+        src=r_path
+        dst=r_path.replace(file_path+'/bite1',result_path2)
+        print(src,dst)
+        shutil.copy(src,dst)
+    for r_path in paths3:
+        # print(r_path)
+        src=r_path
+        dst=r_path.replace(file_path+'/bite2',result_path2)
+        print(src,dst)
+        shutil.copy(src,dst)
+
