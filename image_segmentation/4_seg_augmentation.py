@@ -8,22 +8,22 @@ from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 from parse_args import parse_args
 
 ia.seed(1)
-p = 0.5
+p = 0.4
 # Define our augmentation pipeline.
 seq = iaa.Sequential([
     # iaa.Dropout([0.05, 0.2]),      # drop 5% or 20% of all pixels
     # iaa.Sharpen((0.0, 1.0)),       # sharpen the image
     # iaa.Affine(rotate=(-45, 45)),  # rotate by -45 to 45 degrees (affects segmaps)
     # iaa.ElasticTransformation(alpha=50, sigma=5),  # apply water effect (affects segmaps)
-    # iaa.ChangeColorTemperature((1100, 10000)),
+    # iaa.Sometimes(p, iaa.ChangeColorTemperature((3000, 7000))),
     # iaa.Resize((224, 224)),
     # iaa.Rotate((0, 360)),
-    iaa.Sometimes(p, iaa.Rot90((1, 3))),
+    iaa.Sometimes(p, iaa.Rot90((1, 3), keep_size=False)),
     # iaa.Sometimes(p, iaa.Rotate(90, order=0, fit_output=False)),
     iaa.Sometimes(p, iaa.AddToSaturation((-10, 10))),
     iaa.Sometimes(p, iaa.MultiplyBrightness((0.8, 1.2))),
     iaa.Sometimes(p, iaa.LinearContrast((0.8, 1.2))),
-    iaa.Sometimes(p, iaa.AddToHue((-15, 15))),
+    iaa.Sometimes(p, iaa.AddToHue((-10, 10))),
     iaa.Fliplr(p),
     iaa.Flipud(p)
 ], random_order=True)
@@ -46,15 +46,15 @@ def seg_augmentation(args, mode='train'):
     for path in tqdm.tqdm(os.listdir(os.path.join(input_dir, 'image'))):
         base = path.split('.')[0]
         image_path = os.path.join(os.path.join(input_dir, 'image'), path)
-        mask_path = image_path.replace('image', 'mask')
+        mask_path = os.path.join(os.path.join(args.dataset_dir, 'mask'), path)
         image = cv2.imread(image_path)
         mask = cv2.imread(mask_path)
         shutil.copy(image_path, os.path.join(augmentation_output_dir, 'image',
-                                             base + '[ORIGIN].png'))
+                                             base + '[ORIGIN][IMAGE].png'))
         shutil.copy(mask_path, os.path.join(augmentation_output_dir, 'mask',
                                             base + '[ORIGIN][MASK].png'))
         mask = SegmentationMapsOnImage(mask, shape=image.shape)
-        for i in range(args.aug_nums - 1):
+        for i in range(args.aug_nums):
             image_aug, mask_aug = seq(image=image, segmentation_maps=mask)
             cv2.imwrite(os.path.join(augmentation_output_dir, 'image',
                                      base + '[AUG][{}][IMAGE].png'.format(i)), image_aug)

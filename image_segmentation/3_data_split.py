@@ -43,4 +43,4 @@ def data_spilt(args, save_all_train=False):
 
 if __name__ == '__main__':
     args = parse_args()
-    data_spilt(args, save_all_train=True)
+    data_spilt(args, save_all_train=False)

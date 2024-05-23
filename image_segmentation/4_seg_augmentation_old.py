@@ -88,19 +88,19 @@ def seg_augmentation_old(args, mode='train'):
                                         base + '[ENHANCE].png'))
 
         # 调整色相
-        seed4 = random.randint(3, 8)
-        h_image = enhance_h(image, seed4)
-        h_image.save(os.path.join(augmentation_output_dir, 'image',
-                                  base + '[ENHANCE_H].png'))
-        mask.save(os.path.join(augmentation_output_dir, 'mask',
-                               base + '[ENHANCE_H].png'))
-
-        seed5 = random.randint(-7, -2)
-        h_image2 = enhance_h(image, seed5)
-        h_image2.save(os.path.join(augmentation_output_dir, 'image',
-                                   base + '[ENHANCE_H2].png'))
-        mask.save(os.path.join(augmentation_output_dir, 'mask',
-                               base + '[ENHANCE_H2].png'))
+        # seed4 = random.randint(3, 8)
+        # h_image = enhance_h(image, seed4)
+        # h_image.save(os.path.join(augmentation_output_dir, 'image',
+        #                           base + '[ENHANCE_H].png'))
+        # mask.save(os.path.join(augmentation_output_dir, 'mask',
+        #                        base + '[ENHANCE_H].png'))
+        #
+        # seed5 = random.randint(-7, -2)
+        # h_image2 = enhance_h(image, seed5)
+        # h_image2.save(os.path.join(augmentation_output_dir, 'image',
+        #                            base + '[ENHANCE_H2].png'))
+        # mask.save(os.path.join(augmentation_output_dir, 'mask',
+        #                        base + '[ENHANCE_H2].png'))
 
 
 if __name__ == '__main__':

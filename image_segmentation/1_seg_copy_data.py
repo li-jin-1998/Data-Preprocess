@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from tqdm import tqdm
 
@@ -25,7 +26,7 @@ def copy_data(src, dst):
         #     continue
         file_path = os.path.join(src, p)
         print(file_path, len(os.listdir(file_path)))
-        for p2 in tqdm(os.listdir(file_path)):
+        for p2 in tqdm(os.listdir(file_path), file=sys.stdout):
             if "color" in p2 and "tif" in p2:
                 p3 = p2.replace('tif', 'json')
                 tif_path = os.path.join(file_path, p2)
@@ -33,21 +34,21 @@ def copy_data(src, dst):
                 if os.path.exists(tif_path) and os.path.exists(json_path):
                     shutil.copy(tif_path, os.path.join(dst, p2))
                     shutil.copy(json_path, os.path.join(dst, p3))
-                i = i + 1
+                    i = i + 1
     print(i)
 
 
 if __name__ == '__main__':
-    # src = r'D:\Dataset\数据管理_fq\02_待审核\新增扩展区域'
-    # src2 = r'D:\Dataset\数据管理_fq\03_已查验\01_内部标注数据\王雅妮'
-    # src3 = r'D:\Dataset\数据管理_fq\02_待审核\00_种植'
+    # src = r'D:\Dataset\数据管理_fq\02_待审核\不确定区域扩充\初始数据'
+    # src = r'D:\Dataset\数据管理_fq\02_待审核\不确定区域扩充\种植'
+
     src = r'D:\Dataset\数据管理_fq\02_待审核\07_无牙\四次修改_最新'
 
     args = parse_args()
-    dst = args.initial_dir
-    # if os.path.exists(dst):
-    #     shutil.rmtree(dst)
-    # os.mkdir(dst)
+    dst = args.data_dir
+    if os.path.exists(dst):
+        shutil.rmtree(dst)
+    os.makedirs(dst, exist_ok=True)
     copy_data(src, dst)
     # copy_data(src2, dst)
     # copy_data(src3, dst)

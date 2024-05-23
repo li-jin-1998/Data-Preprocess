@@ -35,6 +35,7 @@ seq = iaa.Sequential([
     # iaa.Sometimes(p, iaa.AddToSaturation((-8, 8))),
     # iaa.Sometimes(p, iaa.AddToBrightness((-20, 20))),
     # iaa.Sometimes(p, iaa.LinearContrast((0.8, 1.2))),
+    iaa.ChangeColorTemperature((3000, 7000)),
     iaa.Sometimes(p, iaa.MultiplyHue((0.8,1.2))),
     # iaa.Multiply((0.8, 1.2), per_channel=0.5)
     # iaa.Fliplr(p),
