@@ -19,7 +19,7 @@ def data_spilt(args, save_all_train=False):
     paths = os.listdir(os.path.join(origin_path, 'image'))
     print(len(paths))
 
-    train, test = train_test_split(paths, test_size=0.2, random_state=42)
+    train, test = train_test_split(paths, test_size=0.2, random_state=101)
     if save_all_train:
         train = paths
     # print(train, test)
@@ -33,4 +33,4 @@ def data_spilt(args, save_all_train=False):
 
 if __name__ == '__main__':
     args = parse_args()
-    data_spilt(args, save_all_train=False)
+    data_spilt(args, save_all_train=True)

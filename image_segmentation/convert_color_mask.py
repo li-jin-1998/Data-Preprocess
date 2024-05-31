@@ -9,7 +9,7 @@ from tqdm import tqdm
 from image_segmentation.parse_args import parse_args
 
 args = parse_args()
-src = os.path.join(args.dataset_dir, 'data/augmentation_train/mask')
+src = os.path.join(args.dataset_dir, 'mask')
 # src = "D:/Projects/UNet/Dataset14/mask/"
 
 dst = src.replace('mask', 'color_mask')
@@ -33,7 +33,7 @@ num_classes = 5
 
 
 i = 0
-for p in tqdm(os.listdir(src)[::50], file=sys.stdout):
+for p in tqdm(os.listdir(src)[::], file=sys.stdout):
     mask_path = os.path.join(src, p)
     image_path = mask_path.replace('mask', 'image')
     image_path = image_path.replace('MASK', 'IMAGE')

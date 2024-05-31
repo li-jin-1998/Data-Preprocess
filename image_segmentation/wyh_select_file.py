@@ -4,18 +4,15 @@ import sys
 
 from tqdm import tqdm
 
-src_path = r'D:\Dataset\2D\外部收集\07_无牙\2024Q1'
-dst_path = r'D:/Projects/UNet/wyh_all2'
+src_path = r'/mnt/algo-storage-server/Workspaces/fangqi/99_无牙'
+dst_path = r"/home/lj/PycharmProjects/wyh/dataset/wyh"
 
-if os.path.exists(dst_path):
-    shutil.rmtree(dst_path)
-os.mkdir(dst_path)
-
-
-
+# if os.path.exists(dst_path):
+#     shutil.rmtree(dst_path)
+os.makedirs(dst_path,exist_ok=True)
 
 for file in os.listdir(src_path):
-    if 'zip' in file:
+    if '20240422112129' not in file:
         continue
     src = os.path.join(src_path, file)
     dst = os.path.join(dst_path, file)

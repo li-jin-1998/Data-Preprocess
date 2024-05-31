@@ -11,19 +11,11 @@ def copy_data(src, dst):
     print("*" * 20)
     print("Copy data.")
     print("*" * 20)
-    # files = ['20230314125819-select']
-    #
-    # for f in os.listdir(src):
-    #     print("'"+f+"',")
-    #     if "20230228115654" not in f and "bracket" not in f and "implant" not in f:
-    #         files.append(f)
     files = os.listdir(src)
     print(len(files), files)
     i = 0
 
     for p in files:
-        # if "bracket" in p or "implant" in p:
-        #     continue
         file_path = os.path.join(src, p)
         print(file_path, len(os.listdir(file_path)))
         for p2 in tqdm(os.listdir(file_path), file=sys.stdout):
@@ -38,17 +30,43 @@ def copy_data(src, dst):
     print(i)
 
 
-if __name__ == '__main__':
-    # src = r'D:\Dataset\数据管理_fq\02_待审核\不确定区域扩充\初始数据'
-    # src = r'D:\Dataset\数据管理_fq\02_待审核\不确定区域扩充\种植'
+def copy_implant():
+    src = r'/mnt/algo-storage-server/Workspaces/fangqi/03_已完成/初始'
+    src2 = r'/mnt/algo-storage-server/Workspaces/fangqi/03_已完成/00_种植'
 
-    src = r'D:\Dataset\数据管理_fq\02_待审核\07_无牙\四次修改_最新'
+    # args = parse_args()
+    # dst = args.data_dir
+    dst = r"/home/lj/PycharmProjects/Data/Implant"
 
-    args = parse_args()
-    dst = args.data_dir
+    # if os.path.exists(dst):
+    #     shutil.rmtree(dst)
+    os.makedirs(dst, exist_ok=True)
+    copy_data(src, dst)
+    copy_data(src2, dst)
+
+
+def copy_edentulous():
+    src = r'/mnt/algo-storage-server/Workspaces/fangqi/03_已完成/07_无牙颌'
+
+    # args = parse_args()
+    # dst = args.data_dir
+    dst = r"/home/lj/PycharmProjects/Data/Edentulous"
     if os.path.exists(dst):
         shutil.rmtree(dst)
     os.makedirs(dst, exist_ok=True)
     copy_data(src, dst)
-    # copy_data(src2, dst)
-    # copy_data(src3, dst)
+
+def copy_additional():
+    src = r'/mnt/algo-storage-server/Workspaces/fangqi/02_待审核/add_low_data'
+
+    dst = r"/home/lj/PycharmProjects/Data/add"
+    if os.path.exists(dst):
+        shutil.rmtree(dst)
+    os.makedirs(dst, exist_ok=True)
+    copy_data(src, dst)
+
+
+if __name__ == '__main__':
+    # copy_implant()
+    # copy_edentulous()
+    copy_additional()

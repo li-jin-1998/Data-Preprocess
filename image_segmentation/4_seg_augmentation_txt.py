@@ -2,11 +2,12 @@ import os
 import shutil
 import sys
 
-import tqdm
 import cv2
 import imgaug as ia
 import imgaug.augmenters as iaa
+import tqdm
 from imgaug.augmentables.segmaps import SegmentationMapsOnImage
+
 from parse_args import parse_args
 
 ia.seed(1)

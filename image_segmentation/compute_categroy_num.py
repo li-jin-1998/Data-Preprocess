@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-pixel_value = 192
+pixel_value = 64
 
 src = "/home/lj/PycharmProjects/2D-image-Segmentation/dataset/mask"
 dst = "/home/lj/PycharmProjects/2D-image-Segmentation/dataset/mask_"+str(pixel_value)
