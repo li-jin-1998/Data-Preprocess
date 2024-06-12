@@ -4,8 +4,6 @@ import sys
 
 from tqdm import tqdm
 
-from parse_args import parse_args
-
 
 def copy_data(src, dst):
     print("*" * 20)
@@ -36,7 +34,7 @@ def copy_implant():
 
     # args = parse_args()
     # dst = args.data_dir
-    dst = r"/home/lj/PycharmProjects/Data/Implant"
+    dst = r"/home/lj/PycharmProjects/Data/Implant2"
 
     # if os.path.exists(dst):
     #     shutil.rmtree(dst)
@@ -56,6 +54,7 @@ def copy_edentulous():
     os.makedirs(dst, exist_ok=True)
     copy_data(src, dst)
 
+
 def copy_additional():
     src = r'/mnt/algo-storage-server/Workspaces/fangqi/02_待审核/add_low_data'
 
@@ -67,6 +66,10 @@ def copy_additional():
 
 
 if __name__ == '__main__':
-    # copy_implant()
+    import time
+
+    start_time = time.time()
+    copy_implant()
     # copy_edentulous()
-    copy_additional()
+    # copy_additional()
+    print("--- %s seconds ---" % (time.time() - start_time))

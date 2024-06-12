@@ -6,6 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 pixel_value = 64
+is_copy = False
 
 src = "/home/lj/PycharmProjects/2D-image-Segmentation/dataset/mask"
 dst = "/home/lj/PycharmProjects/2D-image-Segmentation/dataset/mask_"+str(pixel_value)
@@ -25,8 +26,9 @@ for p in tqdm(os.listdir(src)):
     mask = np.array(mask)
     if pixel_value in mask:
         i = i + 1
-        shutil.copy(mask_path, os.path.join(dst, p.replace('.png', 'mask.png')))
-        image_path = mask_path.replace("/mask", "/image")
-        shutil.copy(image_path, os.path.join(dst, p.replace('.png', 'image.png')))
+        if is_copy:
+            shutil.copy(mask_path, os.path.join(dst, p.replace('.png', 'mask.png')))
+            image_path = mask_path.replace("/mask", "/image")
+            shutil.copy(image_path, os.path.join(dst, p.replace('.png', 'image.png')))
         # print(mask_path)
 print(i, len(os.listdir(src)))

@@ -19,6 +19,10 @@ def labelme_to_mask(args):
     output_path = args.dataset_dir
     if os.path.exists(output_path):
         print('Output directory already exists: ', output_path)
+        confirmation = input("Do you want to remove it? (y/n): ")
+        if confirmation.lower() != 'y':
+            print("Aborting...")
+            return
         shutil.rmtree(output_path)
         # sys.exit(1)
 
@@ -32,8 +36,6 @@ def labelme_to_mask(args):
     # print(json_file_names[4465])
 
     for file_name in tqdm.tqdm(json_file_names, file=sys.stdout):
-        if "[20221031131407_131627][151_upper_color].json" in file_name:
-            continue
         # print('Generating test sample from:', file_name)
         base = os.path.splitext(os.path.basename(file_name))[0]
         out_img_file = os.path.join(output_path, 'image', base + '.png')
@@ -66,5 +68,9 @@ def labelme_to_mask(args):
 
 
 if __name__ == '__main__':
+    import time
+
+    start_time = time.time()
     args = parse_args()
     labelme_to_mask(args)
+    print("--- %s seconds ---" % (time.time() - start_time))

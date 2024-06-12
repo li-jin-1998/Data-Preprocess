@@ -23,10 +23,10 @@ seq = iaa.Sequential([
     # iaa.Rotate((0, 360)),
     iaa.Sometimes(p, iaa.Rot90((1, 3), keep_size=False)),
     # iaa.Sometimes(p, iaa.Rotate(90, order=0, fit_output=False)),
-    iaa.Sometimes(p, iaa.AddToSaturation((-10, 10))),
+    iaa.Sometimes(p, iaa.AddToSaturation((-8, 8))),
     iaa.Sometimes(p, iaa.MultiplyBrightness((0.8, 1.2))),
     iaa.Sometimes(p, iaa.LinearContrast((0.8, 1.2))),
-    iaa.Sometimes(p, iaa.AddToHue((-10, 10))),
+    iaa.Sometimes(p, iaa.AddToHue((-8, 8))),
     iaa.Fliplr(p),
     iaa.Flipud(p)
 ], random_order=True)
@@ -35,6 +35,7 @@ seq = iaa.Sequential([
 def seg_augmentation(args, mode='train'):
     print("*" * 20)
     print(f"Seg {mode} augmentation.")
+    print(f"num: {args.aug_nums}")
     print("*" * 20)
     input_path = os.path.join(args.dataset_dir, 'data')
     txt_file = os.path.join(input_path, mode + '.txt')
@@ -51,15 +52,18 @@ def seg_augmentation(args, mode='train'):
         base = path.split('.')[0]
         image_path = os.path.join(os.path.join(args.dataset_dir, 'image'), path)
         mask_path = os.path.join(os.path.join(args.dataset_dir, 'mask'), path)
+
+        shutil.copy(image_path, os.path.join(augmentation_output_dir, 'image',
+                                             base + '[ORIGIN][IMAGE].png'))
+        shutil.copy(mask_path, os.path.join(augmentation_output_dir, 'mask',
+                                            base + '[ORIGIN][MASK].png'))
+        if mode == 'test':
+            continue
         image = cv2.imread(image_path)
         mask = cv2.imread(mask_path)
         if mask is None or image is None:
             print(image_path)
             continue
-        shutil.copy(image_path, os.path.join(augmentation_output_dir, 'image',
-                                             base + '[ORIGIN][IMAGE].png'))
-        shutil.copy(mask_path, os.path.join(augmentation_output_dir, 'mask',
-                                            base + '[ORIGIN][MASK].png'))
         mask = SegmentationMapsOnImage(mask, shape=image.shape)
         for i in range(args.aug_nums):
             image_aug, mask_aug = seq(image=image, segmentation_maps=mask)
@@ -70,6 +74,10 @@ def seg_augmentation(args, mode='train'):
 
 
 if __name__ == '__main__':
+    import time
+
+    start_time = time.time()
     args = parse_args()
     seg_augmentation(args, 'train')
     seg_augmentation(args, 'test')
+    print("--- %s seconds ---" % (time.time() - start_time))
