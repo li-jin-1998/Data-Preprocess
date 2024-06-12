@@ -43,8 +43,9 @@ class WorkerThread(QThread):
             self.simulate_augmentation()
 
     def simulate_labelme_to_mask(self, input_path, output_path):
+        print(f"Converting {input_path} to {output_path}")
         if os.path.exists(output_path):
-            print("Output directory already exists. Deleting it...")
+            print(f"Output directory {output_path} already exists. Deleting it...")
             # shutil.rmtree(output_path)
         os.makedirs(output_path, exist_ok=True)
         os.makedirs(os.path.join(output_path, 'image'), exist_ok=True)
@@ -54,14 +55,15 @@ class WorkerThread(QThread):
         json_file_names = glob.glob(os.path.join(input_path, '*.json'))
         start_time = time.time()
         for i, file_name in enumerate(json_file_names):
+            # print(f"Processing {file_name}...")
             if not self._is_running:
                 return
 
             base = os.path.splitext(os.path.basename(file_name))[0]
             out_img_file = os.path.join(output_path, 'image', base + '.png')
             out_mask_file = os.path.join(output_path, 'mask', base + '.png')
-            if os.path.exists(out_mask_file):
-                continue
+            # if os.path.exists(out_mask_file):
+            #     continue
 
             label_file = labelme.LabelFile(filename=file_name)
             img = labelme.utils.img_data_to_arr(label_file.imageData)
@@ -143,12 +145,18 @@ class FileOperationWindow(QMainWindow):
             label = QLabel(f"{directories[i]} :")
             directory_layout.addWidget(label)
             directory_input = QLineEdit(self.default_directories[i])
+            directory_input.editingFinished.connect(self.save_default_directories)
             directory_layout.addWidget(directory_input)
             browse_button = QPushButton("Browse")
             browse_button.clicked.connect(lambda state, line_edit=directory_input: self.browse_directory(line_edit))
             directory_layout.addWidget(browse_button)
             self.directory_layouts.append(directory_layout)
             self.layout.addLayout(directory_layout)
+
+        # Add confirmation button
+        confirm_button = QPushButton("Confirm Directories")
+        confirm_button.clicked.connect(self.confirm_directories)
+        self.layout.addWidget(confirm_button)
 
         # Add output panel
         self.output_panel = QTextEdit()
@@ -195,8 +203,25 @@ class FileOperationWindow(QMainWindow):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory", parent_directory)
         if directory:
             line_edit.setText(directory)
-        self.default_directories = [layout.itemAt(1).widget().text() for layout in self.directory_layouts]
-        self.save_default_directories()
+            self.save_default_directories()
+
+    def confirm_directories(self):
+        # Stop all running threads
+        for operation, thread in self.threads.items():
+            if thread.isRunning():
+                thread.stop()
+                thread.wait()
+
+        # Reset all operation widgets
+        for button, progress_bar, stop_button, runtime_label in self.operation_widgets:
+            button.setEnabled(True)
+            progress_bar.setValue(0)
+            stop_button.setEnabled(False)
+            runtime_label.setText("0.00 s")
+
+        directories = [layout.itemAt(1).widget().text() for layout in self.directory_layouts]
+        self.output_panel.append(f"Current Directories:\nData Directory: {directories[0]}\nDataset Directory: {directories[1]}")
+        self.default_directories = directories
 
     def perform_operation(self, operation):
         button, progress_bar, stop_button, runtime_label = next(
