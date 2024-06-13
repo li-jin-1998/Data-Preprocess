@@ -78,6 +78,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
     args = parse_args()
+    args.aug_nums = 2
     seg_augmentation(args, 'train')
     seg_augmentation(args, 'test')
     print("--- %s seconds ---" % (time.time() - start_time))
