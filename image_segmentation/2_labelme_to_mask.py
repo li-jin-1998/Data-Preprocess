@@ -6,71 +6,72 @@ import sys
 import cv2
 import labelme
 import numpy as np
-import tqdm
+from tqdm import tqdm
 
-from parse_args import parse_args
+from config_path import DATA_DIR, DATASET_DIR
 
 
-def labelme_to_mask(args):
-    print("*" * 20)
-    print("Labelme to mask.")
-    print("*" * 20)
-    input_path = args.data_dir
-    output_path = args.dataset_dir
-    if os.path.exists(output_path):
-        print('Output directory already exists: ', output_path)
+def ensure_directory_exists(path):
+    if os.path.exists(path):
+        print(f'Output directory already exists: {path}')
         confirmation = input("Do you want to remove it? (y/n): ")
         if confirmation.lower() != 'y':
             print("Aborting...")
-            return
-        shutil.rmtree(output_path)
-        # sys.exit(1)
+            sys.exit(1)
+        shutil.rmtree(path)
+    os.makedirs(path, exist_ok=True)
 
-    os.makedirs(output_path, exist_ok=True)
 
-    os.makedirs(os.path.join(output_path, 'image'), exist_ok=True)
-    os.makedirs(os.path.join(output_path, 'mask'), exist_ok=True)
-    class_name_to_id = {'gum': 0, '0': 1, '2': 2, '3': 3, '4': 4}
+def process_label_file(file_name, output_path, class_name_to_id):
+    base = os.path.splitext(os.path.basename(file_name))[0]
+    out_img_file = os.path.join(output_path, 'image', base + '.png')
+    out_mask_file = os.path.join(output_path, 'mask', base + '.png')
 
-    json_file_names = glob.glob(os.path.join(input_path, '*.json'))
-    # print(json_file_names[4465])
+    if os.path.exists(out_mask_file):
+        return
 
-    for file_name in tqdm.tqdm(json_file_names, file=sys.stdout):
-        # print('Generating test sample from:', file_name)
-        base = os.path.splitext(os.path.basename(file_name))[0]
-        out_img_file = os.path.join(output_path, 'image', base + '.png')
-        out_mask_file = os.path.join(output_path, 'mask', base + '.png')
-        if os.path.exists(out_mask_file):
-            continue
-        # print(out_mask_file)
-
+    try:
         label_file = labelme.LabelFile(filename=file_name)
-        # with open(out_img_file, 'wb') as f:
-        #     f.write(label_file.imageData)
         img = labelme.utils.img_data_to_arr(label_file.imageData)
-        try:
-            lbl, _ = labelme.utils.shapes_to_label(
-                img_shape=img.shape,
-                shapes=label_file.shapes,
-                label_name_to_value=class_name_to_id)
-            mask = np.array(lbl)
-            mask[mask == 0] = 129
-            mask[mask == 1] = 0
-            mask[mask == 2] = 255
-            mask[mask == 3] = 192
-            mask[mask == 4] = 64
-            cv2.imwrite(out_mask_file, mask)
-            shutil.copy(file_name.replace('json', 'tif'), out_img_file)
+        lbl, _ = labelme.utils.shapes_to_label(
+            img_shape=img.shape,
+            shapes=label_file.shapes,
+            label_name_to_value=class_name_to_id
+        )
+        mask = np.array(lbl)
+        mask[mask == 0] = 129
+        mask[mask == 1] = 0
+        mask[mask == 2] = 255
+        mask[mask == 3] = 192
+        mask[mask == 4] = 64
+        cv2.imwrite(out_mask_file, mask)
+        shutil.copy(file_name.replace('json', 'tif'), out_img_file)
+    except Exception as e:
+        print(f"Error processing {file_name}: {e}")
 
-        except:
-            print(file_name)
-            pass
+
+def labelme_to_mask():
+    print("-" * 20)
+    print("Labelme to mask.")
+    print("-" * 20)
+
+    input_path = DATA_DIR
+    output_path = DATASET_DIR
+
+    ensure_directory_exists(output_path)
+    ensure_directory_exists(os.path.join(output_path, 'image'))
+    ensure_directory_exists(os.path.join(output_path, 'mask'))
+
+    class_name_to_id = {'gum': 0, '0': 1, '2': 2, '3': 3, '4': 4}
+    json_file_names = glob.glob(os.path.join(input_path, '*.json'))
+
+    for file_name in tqdm(json_file_names, desc="Processing files", file=sys.stdout):
+        process_label_file(file_name, output_path, class_name_to_id)
 
 
 if __name__ == '__main__':
     import time
 
     start_time = time.time()
-    args = parse_args()
-    labelme_to_mask(args)
-    print("--- %s seconds ---" % (time.time() - start_time))
+    labelme_to_mask()
+    print(f"--- {time.time() - start_time} seconds ---")

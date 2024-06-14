@@ -1,40 +1,50 @@
 import os
 import shutil
+import time
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
-from parse_args import parse_args
+from config_path import DATASET_DIR
 
 
-def data_spilt(args, save_all_train=False):
-    print("*" * 20)
+def ensure_directory_exists(path):
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path, exist_ok=True)
+
+
+def split_data(paths, test_size=0.2, random_state=2024, save_all_train=False):
+    if save_all_train:
+        return paths, []
+    return train_test_split(paths, test_size=test_size, random_state=random_state)
+
+
+def write_list_to_file(file_path, data_list):
+    with open(file_path, 'w') as file:
+        for item in tqdm(data_list, desc=f"Writing to {os.path.basename(file_path)}"):
+            file.write(item + '\n')
+
+
+def data_split(save_all_train=False):
+    print("-" * 20)
     print("Data split.")
-    print("*" * 20)
-    origin_path = args.dataset_dir
+    print("-" * 20)
+
+    origin_path = DATASET_DIR
     result_path = os.path.join(origin_path, 'data')
 
-    if os.path.exists(result_path):
-        shutil.rmtree(result_path)
-    os.mkdir(result_path)
+    ensure_directory_exists(result_path)
 
     paths = os.listdir(os.path.join(origin_path, 'image'))
-    print(len(paths))
+    print(f"Total files: {len(paths)}")
 
-    train, test = train_test_split(paths, test_size=0.2, random_state=2024)
-    if save_all_train:
-        train = paths
-    # print(train, test)
-    print(len(train), len(test))
-    with open(os.path.join(result_path, 'train.txt'), 'w') as file:
-        for path in tqdm(train):
-            file.write(path + '\n')
-    with open(os.path.join(result_path, 'test.txt'), 'w') as file:
-        for path in tqdm(test):
-            file.write(path + '\n')
+    train, test = split_data(paths, save_all_train=save_all_train)
+    print(f"Train set size: {len(train)}, Test set size: {len(test)}")
+
+    write_list_to_file(os.path.join(result_path, 'train.txt'), train)
+    write_list_to_file(os.path.join(result_path, 'test.txt'), test)
+
 
 if __name__ == '__main__':
-    import time
-
     start_time = time.time()
-    args = parse_args()
-    data_spilt(args, save_all_train=False)
-    print("--- %s seconds ---" % (time.time() - start_time))
+    data_split(save_all_train=False)
+    print(f"--- {time.time() - start_time} seconds ---")

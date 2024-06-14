@@ -1,12 +1,12 @@
-import argparse
 import os
 import random
 import shutil
 
-from PIL import ImageEnhance
 import PIL.Image
 import tqdm
-from parse_args import parse_args
+from PIL import ImageEnhance
+
+from config_path import DATASET_DIR
 
 
 def enhance_h(image, hue=6):
@@ -16,8 +16,8 @@ def enhance_h(image, hue=6):
     return image
 
 
-def seg_augmentation_old(args, mode='train'):
-    input_path = os.path.join(args.dataset_dir, 'data')
+def seg_augmentation_old(mode='train'):
+    input_path = os.path.join(DATASET_DIR, 'data')
     input_dir = os.path.join(input_path, mode)
     augmentation_output_dir = os.path.join(input_path, 'augmentation2_' + mode)
     if os.path.exists(augmentation_output_dir):
@@ -104,6 +104,5 @@ def seg_augmentation_old(args, mode='train'):
 
 
 if __name__ == '__main__':
-    args = parse_args()
-    seg_augmentation_old(args, 'train')
-    seg_augmentation_old(args, 'test')
+    seg_augmentation_old('train')
+    seg_augmentation_old('test')

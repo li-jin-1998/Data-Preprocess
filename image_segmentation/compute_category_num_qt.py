@@ -4,8 +4,9 @@ import shutil
 import sys
 
 import cv2
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QFileDialog, \
-    QLabel, QLineEdit, QCheckBox, QTextEdit
+    QLabel, QLineEdit, QCheckBox, QTextEdit, QProgressBar
 from tqdm import tqdm
 
 CONFIG_FILE = 'ImageProcessingApp.json'
@@ -22,51 +23,59 @@ class ImageProcessingApp(QMainWindow):
         self.setCentralWidget(self.main_widget)
         self.layout = QVBoxLayout(self.main_widget)
 
-        # Source directory input
+        self.create_form()
+        self.create_output_console()
+        self.create_progress_bar()
+
+        self.load_config()
+
+    def create_form(self):
+        form_layout = QVBoxLayout()
+
         self.src_directory_label = QLabel("Source Directory:", self)
-        self.layout.addWidget(self.src_directory_label)
+        form_layout.addWidget(self.src_directory_label)
 
         self.src_directory_input = QLineEdit(self)
-        self.layout.addWidget(self.src_directory_input)
+        form_layout.addWidget(self.src_directory_input)
 
         self.src_browse_button = QPushButton("Browse", self)
         self.src_browse_button.clicked.connect(self.browse_src_directory)
-        self.layout.addWidget(self.src_browse_button)
+        form_layout.addWidget(self.src_browse_button)
 
-        # Destination directory input
         self.dst_directory_label = QLabel("Destination Directory:", self)
-        self.layout.addWidget(self.dst_directory_label)
+        form_layout.addWidget(self.dst_directory_label)
 
         self.dst_directory_input = QLineEdit(self)
-        self.layout.addWidget(self.dst_directory_input)
+        form_layout.addWidget(self.dst_directory_input)
 
         self.dst_browse_button = QPushButton("Browse", self)
         self.dst_browse_button.clicked.connect(self.browse_dst_directory)
-        self.layout.addWidget(self.dst_browse_button)
+        form_layout.addWidget(self.dst_browse_button)
 
-        # Pixel value input
         self.pixel_value_label = QLabel("Pixel Value:", self)
-        self.layout.addWidget(self.pixel_value_label)
+        form_layout.addWidget(self.pixel_value_label)
 
         self.pixel_value_input = QLineEdit(self)
-        self.layout.addWidget(self.pixel_value_input)
+        form_layout.addWidget(self.pixel_value_input)
 
-        # Copy files checkbox
         self.copy_files_checkbox = QCheckBox("Copy Files", self)
-        self.layout.addWidget(self.copy_files_checkbox)
+        form_layout.addWidget(self.copy_files_checkbox)
 
-        # Process button
         self.process_button = QPushButton("Process", self)
         self.process_button.clicked.connect(self.process_images)
-        self.layout.addWidget(self.process_button)
+        form_layout.addWidget(self.process_button)
 
-        # Output console
+        self.layout.addLayout(form_layout)
+
+    def create_output_console(self):
         self.output_console = QTextEdit(self)
         self.output_console.setReadOnly(True)
         self.layout.addWidget(self.output_console)
 
-        # Load config
-        self.load_config()
+    def create_progress_bar(self):
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.progress_bar)
 
     def log_output(self, message):
         self.output_console.append(message)
@@ -100,7 +109,6 @@ class ImageProcessingApp(QMainWindow):
             return
 
         pixel_value = int(pixel_value)
-
         self.log_output(f"Starting image processing with pixel value {pixel_value}...")
 
         if is_copy:
@@ -110,8 +118,9 @@ class ImageProcessingApp(QMainWindow):
 
         count = 0
         src_files = [entry for entry in os.scandir(src_directory) if entry.is_file() and entry.name.endswith('.png')]
+        self.progress_bar.setMaximum(len(src_files))
 
-        for entry in tqdm(src_files, desc="Processing masks"):
+        for idx, entry in enumerate(tqdm(src_files, desc="Processing masks")):
             mask_path = entry.path
             mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
             if mask is None:
@@ -120,14 +129,21 @@ class ImageProcessingApp(QMainWindow):
             if pixel_value in mask:
                 count += 1
                 if is_copy:
-                    shutil.copy(mask_path, os.path.join(dst_directory, entry.name.replace('.png', 'mask.png')))
-                    image_path = mask_path.replace("/mask", "/image")
-                    shutil.copy(image_path, os.path.join(dst_directory, entry.name.replace('.png', 'image.png')))
+                    self.copy_files(mask_path, dst_directory, entry.name)
 
+            self.progress_bar.setValue(idx + 1)
+
+        self.log_output("-" * 100)
         self.log_output(f"Total masks with pixel value {pixel_value}: {count}")
         self.log_output(f"Total masks processed: {len(src_files)}")
+        self.log_output("-" * 100)
 
         self.save_config()
+
+    def copy_files(self, mask_path, dst_directory, file_name):
+        shutil.copy(mask_path, os.path.join(dst_directory, file_name.replace('.png', 'mask.png')))
+        image_path = mask_path.replace("/mask", "/image")
+        shutil.copy(image_path, os.path.join(dst_directory, file_name.replace('.png', 'image.png')))
 
     def load_config(self):
         if os.path.exists(CONFIG_FILE):

@@ -1,27 +1,30 @@
 import os
-
 import cv2
 import numpy as np
 import tqdm
 
 
 def preprocess(image_path, mask_path, image_size):
-    image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.resize(image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
-    # image = cv2.bilateralFilter(image, 2, 50, 50)  # remove images noise.
-    # img = cv2.applyColorMap(img, cv2.COLORMAP_BONE)  # produce a pseudocolored image. 伪彩色
-    # image = np.array(image, np.float32)
-    # image = image / 127.5 - 1
+    try:
+        image = cv2.imread(image_path)
+        if image is None:
+            raise IOError(f"Failed to read image: {image_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (image_size, image_size), interpolation=cv2.INTER_CUBIC)
 
-    mask = cv2.imread(mask_path)
-    mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-    mask = cv2.resize(mask, (image_size, image_size), interpolation=cv2.INTER_NEAREST)
-    mask[mask == 64.0] = 1.0
-    mask[mask == 129.0] = 2.0
-    mask[mask == 192.0] = 3.0
-    mask[mask == 255.0] = 4.0
-    return image, mask
+        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        if mask is None:
+            raise IOError(f"Failed to read mask: {mask_path}")
+        mask = cv2.resize(mask, (image_size, image_size), interpolation=cv2.INTER_NEAREST)
+        mask[mask == 64] = 1
+        mask[mask == 129] = 2
+        mask[mask == 192] = 3
+        mask[mask == 255] = 4
+
+        return image, mask
+    except Exception as e:
+        print(f"Error in preprocess: {e}")
+        return None, None
 
 
 def save_batch(images, masks, batch_index, output_dir):
@@ -41,7 +44,6 @@ def png_npy(input_dir, image_size=224, batch_size=10000):
     masks = []
     batch_index = 0
 
-    # 确保输入目录存在
     if not os.path.exists(input_dir):
         print(f"Input directory {input_dir} does not exist.")
         return
@@ -53,42 +55,38 @@ def png_npy(input_dir, image_size=224, batch_size=10000):
         print(f"Image or mask directory does not exist.")
         return
 
-    # 获取所有图像文件名
     image_paths = sorted(os.listdir(image_dir))
 
-    for i, path in enumerate(tqdm.tqdm(image_paths[::])):
+    for path in tqdm.tqdm(image_paths, desc=f"Processing {input_dir}", file=sys.stdout):
         image_path = os.path.join(image_dir, path)
         mask_path = os.path.join(mask_dir, path.replace("IMAGE", "MASK"))
 
-        if not os.path.exists(image_path) or not os.path.exists(mask_path):
-            print(f"Skipping {path}, corresponding mask or image not found.")
-            continue
+        try:
+            image, mask = preprocess(image_path, mask_path, image_size=image_size)
+            if image is None or mask is None:
+                continue
 
-        # 处理图像和掩码
-        image, mask = preprocess(image_path, mask_path, image_size=image_size)
-        images.append(image)
-        masks.append(mask)
+            images.append(image)
+            masks.append(mask)
 
-        # 每 batch_size 张图像保存为一个 .npy 文件
-        if len(images) == batch_size:
-            save_batch(images, masks, batch_index, input_dir)
-            images = []
-            masks = []
-            batch_index += 1
+            if len(images) == batch_size:
+                save_batch(images, masks, batch_index, input_dir)
+                images = []
+                masks = []
+                batch_index += 1
 
-    # 保存最后一批图像
+        except Exception as e:
+            print(f"Error processing {image_path}: {e}")
+
     if images:
         save_batch(images, masks, batch_index, input_dir)
 
 
 if __name__ == '__main__':
-    # from parse_args import parse_args
-
-    # args = parse_args()
     data_path = r'/home/lj/PycharmProjects/2D-image-Segmentation/dataset/data'
 
     train_input_dir = os.path.join(data_path, 'augmentation_train')
     test_input_dir = os.path.join(data_path, 'augmentation_test')
 
-    png_npy(train_input_dir, 224)
-    png_npy(test_input_dir, 224)
+    png_npy(train_input_dir, image_size=224)
+    png_npy(test_input_dir, image_size=224)
