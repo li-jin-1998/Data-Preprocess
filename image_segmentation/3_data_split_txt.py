@@ -1,8 +1,10 @@
 import os
 import shutil
 import time
+
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+
 from config_path import DATASET_DIR
 
 
@@ -13,9 +15,10 @@ def ensure_directory_exists(path):
 
 
 def split_data(paths, test_size=0.2, random_state=2024, save_all_train=False):
+    train, test = train_test_split(paths, test_size=test_size, random_state=random_state)
     if save_all_train:
-        return paths, []
-    return train_test_split(paths, test_size=test_size, random_state=random_state)
+        train = paths
+    return train, test
 
 
 def write_list_to_file(file_path, data_list):
@@ -46,5 +49,5 @@ def data_split(save_all_train=False):
 
 if __name__ == '__main__':
     start_time = time.time()
-    data_split(save_all_train=False)
+    data_split(save_all_train=True)
     print(f"--- {time.time() - start_time} seconds ---")

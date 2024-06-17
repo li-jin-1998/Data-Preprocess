@@ -6,10 +6,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from image_segmentation.parse_args import parse_args
-
-args = parse_args()
-src = os.path.join(args.dataset_dir, 'mask')
+src = os.path.join("/home/lj/PycharmProjects/2D-Image-Segmentation/dataset2", 'mask')
 # src = "D:/Projects/UNet/Dataset14/mask/"
 
 dst = src.replace('mask', 'color_mask')
@@ -29,8 +26,8 @@ def check_class_distribution(masks, num_classes):
         class_counts[i] = np.sum(masks == i)
     return class_counts
 
-num_classes = 5
 
+num_classes = 5
 
 i = 0
 for p in tqdm(os.listdir(src)[::], file=sys.stdout):
@@ -41,6 +38,8 @@ for p in tqdm(os.listdir(src)[::], file=sys.stdout):
     image = cv2.imread(image_path)
 
     mask = cv2.imread(mask_path)
+    shutil.copy(image_path, mask_path.replace('mask', 'color_mask'))
+    shutil.copy(mask_path, mask_path.replace('mask', 'color_mask').replace('[Image]', "[Mask]"))
     # mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     mask = np.array(mask)
 
@@ -48,4 +47,4 @@ for p in tqdm(os.listdir(src)[::], file=sys.stdout):
     # print(f"类别像素分布: {class_counts}")
 
     color_mask = image * (mask > 0)
-    cv2.imwrite(mask_path.replace('mask', 'color_mask'), color_mask)
+    cv2.imwrite(mask_path.replace('mask', 'color_mask').replace('[Image]', "[MaskColor]"), color_mask)

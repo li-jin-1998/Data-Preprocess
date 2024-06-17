@@ -18,8 +18,8 @@ def copy_files(src, dst):
             folder_path = os.path.join(src, folder)
             if os.path.isdir(folder_path):
                 for file in tqdm(os.listdir(folder_path), desc=f"Copying from {folder}", file=sys.stdout):
-                    if "color" in file and file.endswith("tif"):
-                        json_file = file.replace('tif', 'json')
+                    if ("color" in file and file.endswith("tif")) or ("Image" in file and file.endswith("png")):
+                        json_file = file.replace('tif', 'json').replace('png', 'json')
                         tif_path = os.path.join(folder_path, file)
                         json_path = os.path.join(folder_path, json_file)
                         if os.path.exists(tif_path) and os.path.exists(json_path):
@@ -59,8 +59,8 @@ def copy_edentulous():
 
 
 def copy_additional():
-    src = r'/mnt/algo-storage-server/Workspaces/fangqi/02_待审核/add_low_data'
-    dst = r"/home/lj/PycharmProjects/Data/add2"
+    src = r'/mnt/algo-storage-server/Workspaces/fangqi/01_待标注/00_种植/0614'
+    dst = r"/home/lj/PycharmProjects/Data/add3"
     setup_destination_directory(dst)
     copy_files(src, dst)
 

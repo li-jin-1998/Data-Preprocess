@@ -28,7 +28,7 @@ def copy_files(src_dir, dst_dir, file_extension=".png"):
 
 
 def main():
-    src_base_dir = "/home/lj/PycharmProjects/2D-image-Segmentation/dataset"
+    src_base_dir = "/home/lj/PycharmProjects/2D-Image-Segmentation/dataset2"
     dst_base_dir = "/home/lj/PycharmProjects/2D-Image-Segmentation/dataset"
 
     copy_files(os.path.join(src_base_dir, "image"), os.path.join(dst_base_dir, "image"))

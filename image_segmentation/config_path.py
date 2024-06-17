@@ -8,7 +8,7 @@ def ensure_directory_exists(path):
     os.makedirs(path, exist_ok=True)
 
 
-DATA_DIR = "/home/lj/PycharmProjects/Data/Implant2"
+DATA_DIR = "/home/lj/PycharmProjects/Data/add3"
 
 DATASET_DIR = "/home/lj/PycharmProjects/2D-Image-Segmentation/dataset"
 

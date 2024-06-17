@@ -181,9 +181,10 @@ class ImageBrowser(QWidget):
 
         for image_type in image_types:
             image_path = os.path.join(self.lastDirectory, selected_file.replace('image.png', image_type))
-            image_paths.append(image_path)
 
             if os.path.exists(image_path):
+                image_paths.append(image_path)
+
                 label = QLabel(self)
                 pixmap = QPixmap(image_path)
                 pixmap = pixmap.scaled(400, 400, Qt.KeepAspectRatio)  # 调整图像大小
@@ -225,6 +226,8 @@ class ImageBrowser(QWidget):
 
 
 def calculate_dice(image1_path, image2_path):
+    if not os.path.exists(image1_path) or not os.path.exists(image2_path):
+        return 0
     image1 = Image.open(image1_path).convert('L')
     image2 = Image.open(image2_path).convert('L')
 
@@ -239,6 +242,8 @@ def calculate_dice(image1_path, image2_path):
 
 
 def calculate_iou(image1_path, image2_path):
+    if not os.path.exists(image1_path) or not os.path.exists(image2_path):
+        return 0
     image1 = Image.open(image1_path).convert('L')
     image2 = Image.open(image2_path).convert('L')
 

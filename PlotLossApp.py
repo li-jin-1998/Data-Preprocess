@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QWidget, QHBoxLa
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 # 全局变量用于存储配置文件路径
-CONFIG_FILE = 'config.json'
+CONFIG_FILE = 'PlotLossApp.json'
 
 
 # 从txt文件读取数据
@@ -29,7 +29,7 @@ class CustomListWidget(QListWidget):
     def set_directory(self, directory):
         self.clear()
         file_list = [file for file in os.listdir(directory) if file.endswith('.txt')]
-        for file_name in file_list:
+        for file_name in sorted(file_list):
             item = QListWidgetItem(file_name)
             self.addItem(item)
 
